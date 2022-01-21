@@ -51,11 +51,11 @@ def pdf_to_images():
 
 
         for index, page in enumerate(pages):
-            file_path = image_file_dir + "/out%s.jpg" % index
+            file_path = image_file_dir +"/%s/out%s.jpg" % (booth.id, index)
             page.save(file_path, 'JPEG')
             print("Saved File: %s" % file_path)
 
-            file_url = 'booth/images' + "/out%s.jpg" % index
+            file_url = "booth/images/%s/out%s.jpg" % (booth.id, index)
 
             page_type = VoterListPageTypes.VOTER_LIST.name
             if index == 1:
