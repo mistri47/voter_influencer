@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 import pytesseract
 import pandas as pd
-import googletrans
 from googletrans import Translator
+from textblob import TextBlob
 
 from .models import *
 from django.conf import settings
@@ -61,12 +61,37 @@ def format_txt(txt):
 #
 # Get text from any image and print
 #
+
+def read_voter_id(img):
+    try:
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        custom_config = r'-l eng --psm 6'
+        txt = pytesseract.image_to_string(rgb, config=custom_config)
+        tb = TextBlob(txt)
+        return format_txt(tb)
+    except Exception as e:
+        print(e)
+        return None
+
+def read_serial_id(img):
+    try:
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        custom_config = r'-l eng --psm 6'
+        txt = pytesseract.image_to_string(rgb, config=custom_config)
+        tb = TextBlob(txt)
+        return format_txt(tb)
+    except Exception as e:
+        print(e)
+        return None
+
+
 def image_to_text_hindi(img):
     try:
-        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        custom_config = r'-l hin --psm 6'
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        custom_config = r'-l hin+eng --psm 6'
         txt = pytesseract.image_to_string(rgb, config=custom_config)
-        return format_txt(txt)
+        tb = TextBlob(txt)
+        return format_txt(tb)
     except Exception as e:
         print(e)
         return None
@@ -74,18 +99,25 @@ def image_to_text_hindi(img):
 
 def image_to_text_english(img):
     try:
-        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         custom_config = r'-l eng+hin --psm 6'
         txt = pytesseract.image_to_string(rgb, config=custom_config)
+        # tb = TextBlob(txt)
         try:
-            translator = Translator()
+            translator = None
+            try:
+                translator = Translator(service_urls=["translate.google.com", "translate.google.co.uk"])
+            except Exception as e:
+                translator = Translator()
+
             translator.raise_Exception = True
             translated = translator.translate(txt, src='hi', dest='en')
+            return format_txt(translated.text)
         except Exception as e:
             print(e)
-            translated = txt
+            return format_txt(txt)
 
-        return format_txt(translated.text)
+        
     except Exception as e:
         print(e)
         return None
@@ -144,7 +176,7 @@ def box_extraction(polling_stations_image):
         (contours, boundingBoxes) = sort_contours(contours, method="top-to-bottom")
 
         print("Output stored in Output directiory!")
-        image_dir = settings.MEDIA_ROOT + '/booth/images/'+ str(polling_stations_image.station.id) + "/cropped/"
+        image_dir = settings.MEDIA_ROOT + '/booth/images/'+ str(polling_stations_image.station.id) + "/" + str(polling_stations_image.id) + "/cropped/"
 
         try:
             os.stat(image_dir)
@@ -152,23 +184,26 @@ def box_extraction(polling_stations_image):
             os.makedirs(image_dir)
             
         idx = 0
+        VoterImage.objects.filter(station_image=polling_stations_image).delete()
+
         for c in contours:
-            #print(c)
             # Returns the location and width,height for every contour
             x, y, w, h = cv2.boundingRect(c)
 
             # If the box height is greater then 20, widht is >80, then only save it as a box in "cropped/" folder.
-            if (w > 1000 and h > 300 and w < 2000 and h < 1000):
+            if (w > 1240 and h > 470 and w < 1300 and h < 500):
+                print(c)
                 idx += 1
                 new_img = img[y:y+h, x:x+w]
                 image_path = image_dir + str(idx) + '.png'
+                image_url = 'booth/images/'+ str(polling_stations_image.station.id) + "/" + str(polling_stations_image.id) + "/cropped/" + str(idx) + '.png'
 
                 cv2.imwrite(image_path, new_img)
-                voter_image = VoterImage(station_image=polling_stations_image, image=image_path)
+                voter_image = VoterImage(station_image=polling_stations_image, image=image_url)
                 voter_image.save()
             else:
-                pass
-                # print("x %s, y %s, w %s, h %s " % (x,y,w,h))
+                print("ERROR: Image not in desired sizee")
+                print("x %s, y %s, w %s, h %s " % (x,y,w,h))
 
         # For Debugging
         # Enable this line to see all contours.
@@ -199,59 +234,6 @@ def process_voter_list_page():
             #img = cv2.imread(polling_stations_image.image.path)
             
             box_extraction(polling_stations_image)
-
-            for voter_image in VoterImage.objects.filter(station_image=polling_stations_image):
-                #
-                # Below we are cropping and extracting from single voter detail image.
-                #
-
-                crop_img = cv2.imread(voter_image.image.path)
-
-                if crop_img:
-
-                    serial_cropped = crop_img[10:70, 30:260]  # Cropping Serial ID
-                    serial_id = image_to_text_english(serial_cropped)
-
-                    id_cropped = crop_img[10:85, 800:1230]  # Cropping Voter ID
-                    voter_id = image_to_text_english(id_cropped)
-
-                    # photo_cropped = crop_img[100:485, 900:1250]  # Cropping Photo
-                    # image_to_text(photo_cropped)
-
-                    data_cropped = crop_img[82:480, 10:900]  # Cropping Photo
-                    data_hindi = image_to_text_hindi(data_cropped)
-                    data_english = image_to_text_english(data_cropped)
-
-                    try:
-                        # write_to_csv([serial_id, voter_id, data_english, data_hindi])
-                        try:
-                            existing_voter = Voter.objects.get(voter_id=voter_id)
-                            existing_voter.serial_number = serial_id
-                            existing_voter.data_eng = data_english
-                            existing_voter.data_hin = data_hindi
-                            existing_voter.polling_station_image = polling_stations_image
-                            existing_voter.save()
-                        except Exception as e:
-                            print(e)
-                            try:
-                                voter = Voter(
-                                    voter_id=voter_id,
-                                    serial_number=serial_id,
-                                    data_eng=data_english,
-                                    data_hin=data_hindi,
-                                    polling_booth=booth,
-                                    polling_station_image=polling_stations_image
-                                )
-                                voter.save()
-                            except Exception as e:
-                                print(e)
-
-                    except Exception as e:
-                        print(e)
-                        print("Error in saving record")
-                        print(voter_id)
-                        print(data_english)
-
             polling_stations_image.is_processed = True
             polling_stations_image.save()
 
@@ -259,73 +241,68 @@ def process_voter_list_page():
 
 
 
-        # for image in images:
-        #     Voter.objects.filter(polling_station_image=image).delete()
-        #     img = cv2.imread(image.image.path)
-        #     x = 170
-        #     y = 282
+def process_voter_detail_image():
 
-        #     w = 1260
-        #     h = 488
+    for voter_image in VoterImage.objects.filter(is_processed=False, has_errors=False)[:100]:
+        print(voter_image)
+        voter_image.voters.all().delete()
+        #
+        # Below we are cropping and extracting from single voter detail image.
+        #
 
-        #     for j in range(0, 10):
-        #         for i in range(1, 4):
-        #             # print("Coordinates: %s:%sx%s:%s" % (x, y, x+w, y+h))
-        #             crop_img = img[y:y+h, x:x+w]
-        #             x = x+w
+        print(voter_image.image.path)
+        crop_img = cv2.imread(voter_image.image.path)
 
-        #             serial_cropped = crop_img[10:70, 30:260]  # Cropping Serial ID
-        #             serial_id = image_to_text_english(serial_cropped)
+        # if crop_img:
 
-        #             id_cropped = crop_img[10:85, 800:1230]  # Cropping Voter ID
-        #             voter_id = image_to_text_english(id_cropped)
+        #serial_cropped = crop_img[0:23, 8:104]  # Cropping Serial ID
+        serial_cropped = crop_img[10:70, 30:260]  # Cropping Serial ID
+        serial_id = read_serial_id(serial_cropped)
+        print(serial_id)
 
-        #             # photo_cropped = crop_img[100:485, 900:1250]  # Cropping Photo
-        #             # image_to_text(photo_cropped)
+        #id_cropped = crop_img[0:0+27, 350:350+140]  # Cropping Voter ID
+        id_cropped = crop_img[10:85, 800:1230]  # Cropping Voter ID
+        voter_id = read_voter_id(id_cropped)
+        print(voter_id)
 
-        #             data_cropped = crop_img[82:480, 10:900]  # Cropping Photo
-        #             data_hindi = image_to_text_hindi(data_cropped)
-        #             data_english = image_to_text_english(data_cropped)
+        # photo_cropped = crop_img[100:485, 900:1250]  # Cropping Photo
+        # image_to_text(photo_cropped)
 
-        #             try:
-        #                 # write_to_csv([serial_id, voter_id, data_english, data_hindi])
-        #                 try:
-        #                     existing_voter = Voter.objects.get(voter_id=voter_id)
-        #                     existing_voter.serial_number = serial_id
-        #                     existing_voter.data_eng = data_english
-        #                     existing_voter.data_hin = data_hindi
-        #                     existing_voter.polling_station_image = image
-        #                     existing_voter.save()
-        #                 except Exception as e:
-        #                     print(e)
-        #                     try:
-        #                         voter = Voter(
-        #                             voter_id=voter_id,
-        #                             serial_number=serial_id,
-        #                             data_eng=data_english,
-        #                             data_hin=data_hindi,
-        #                             polling_booth=booth,
-        #                             polling_station_image=image
-        #                         )
-        #                         voter.save()
-        #                     except Exception as e:
-        #                         print(e)
+        #data_cropped = crop_img[28:28+150, 0:0+350]
+        data_cropped = crop_img[70:480, 10:900]  # Main Details
+        data_hindi = image_to_text_hindi(data_cropped)
+        #data_english = image_to_text_english(data_cropped)
+        #print(data_english)
+        print(data_hindi)
 
-        #             except Exception as e:
-        #                 print(e)
-        #                 print("Error in saving record")
-        #                 print(voter_id)
-        #                 print(data_english)
 
-        #         y = y+h
-        #         x = 170
-        #     image.is_processed = True
-        #     image.save()
-
-#header = ['serial_id', 'voter_id', 'data_english', 'data_hindi']
-
-# cv2.imshow("cropped", img)
-
-# ! Coordinates for ID: 10:70, 30:270
-# ! Coordinates for VoterID: 10:85, 800:1250
-# ! Coordinates for Photo: 100:485, 900:1250
+        try:
+            voter = Voter(
+                voter_id=voter_id,
+                serial_number=serial_id,
+                #data_eng=data_english,
+                data_hin=data_hindi,
+                polling_booth = voter_image.station_image.station,
+                voter_image = voter_image
+            )
+            voter.save()
+            voter_image.is_processed = True
+            voter_image.has_errors = False
+            voter_image.save()
+        except Exception as e:
+            try:
+                existing_voter = Voter.objects.get(voter_id=voter_id)
+                existing_voter.serial_number = serial_id
+                #existing_voter.data_eng = data_english
+                existing_voter.data_hin = data_hindi
+                existing_voter.data_eng = None
+                existing_voter.voter_image = voter_image
+                existing_voter.save()
+                voter_image.is_processed = True
+                voter_image.has_errors = False
+                voter_image.save()
+            except Exception as e:
+                print(e)
+                voter_image.is_processed = True
+                voter_image.has_errors = True
+                voter_image.save()

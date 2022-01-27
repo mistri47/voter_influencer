@@ -272,6 +272,7 @@ tags
 ### Project template
 
 voter_influencer/media/
+Images/*
 
 .pytest_cache/
 
@@ -280,3 +281,5 @@ voter_influencer/media/
 .env
 .envs/*
 !.envs/.local/
+
+token

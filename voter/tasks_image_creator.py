@@ -24,34 +24,11 @@ def pdf_to_images():
         except:
             os.makedirs(image_file_dir)
 
-        pages = convert_from_path(booth.voter_list.path)
-
-        # convert_from_path(
-        #     pdf_path,
-        #     dpi=200,
-        #     output_folder=None,
-        #     first_page=None,
-        #     last_page=None,
-        #     fmt="ppm",
-        #     jpegopt=None,
-        #     thread_count=1,
-        #     userpw=None,
-        #     use_cropbox=False,
-        #     strict=False,
-        #     transparent=False,
-        #     single_file=False,
-        #     output_file=uuid_generator(),
-        #     poppler_path=None,
-        #     grayscale=False,
-        #     size=None,
-        #     paths_only=False,
-        #     hide_annotations=False,
-        # )
-
+        pages = convert_from_path(booth.voter_list.path, 500)
 
 
         for index, page in enumerate(pages):
-            file_path = image_file_dir +"/%s/out%s.jpg" % (booth.id, index)
+            file_path = image_file_dir +"/out%s.jpg" % (index)
             page.save(file_path, 'JPEG')
             print("Saved File: %s" % file_path)
 

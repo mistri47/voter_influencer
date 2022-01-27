@@ -87,12 +87,18 @@ def box_extraction(img_for_box_extraction_path, cropped_dir_path):
         x, y, w, h = cv2.boundingRect(c)
 
         # If the box height is greater then 20, widht is >80, then only save it as a box in "cropped/" folder.
-        if (w > 1000 and h > 300 and w < 2000 and h < 1000):
-            idx += 1
-            new_img = img[y:y+h, x:x+w]
-            cv2.imwrite(cropped_dir_path+str(idx) + '.png', new_img)
+        # if (w > 1000 and h > 300 and w < 2000 and h < 1000):
+        idx += 1
+        new_img = img[y:y+h, x:x+w]
+
+        # ID: 57 x 2685, y 3222, w 1244, h 474 = Voter image diamentions
+        if (x==8 and y==0):
+            cv2.imwrite(cropped_dir_path+str(idx) + '_serial.png', new_img)
+        elif (w > 110 and h > 140 and w < 120 and h < 150):
+            cv2.imwrite(cropped_dir_path+str(idx) + '_image.png', new_img)
         else:
-            print("x %s, y %s, w %s, h %s " % (x,y,w,h))
+            cv2.imwrite(cropped_dir_path+str(idx) + '.png', new_img)
+            print("ID: %s x %s, y %s, w %s, h %s " % (idx, x,y,w,h))
 
     # For Debugging
     # Enable this line to see all contours.
@@ -102,4 +108,4 @@ def box_extraction(img_for_box_extraction_path, cropped_dir_path):
 
 
 #Input image path and out folder
-box_extraction("voter_influencer/media/out24.jpg", "./cropped/")
+box_extraction("voter_influencer/media/booth/images/1/out24.jpg", "./Images/cropped/")

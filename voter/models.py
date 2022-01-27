@@ -33,6 +33,7 @@ class PollingStationImage(models.Model):
     page_number = models.SmallIntegerField()
     is_processed = models.BooleanField(default=False)
     has_errors = models.BooleanField(default=False)
+    md5_signature = models.CharField(max_length=1000)
 
     def __str__(self) -> str:
         return self.image.url
@@ -42,6 +43,8 @@ class PollingStationImage(models.Model):
 class VoterImage(models.Model):
     station_image = models.ForeignKey(PollingStationImage, related_name='voter_images', on_delete=CASCADE)
     image = models.FileField(null=True, blank=True)
+    is_processed = models.BooleanField(default=False)
+    has_errors = models.BooleanField(default=False)
     
     def __str__(self) -> str:
         return self.image.url
@@ -80,7 +83,7 @@ class Voter(models.Model):
     husband_name = models.CharField(max_length=100, null=True, blank=True)
     age = models.SmallIntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=GENDERS, null=True, blank=True)
-    house_number = models.IntegerField(null=True, blank=True)
+    house_number = models.CharField(max_length=20, null=True, blank=True)
 
     category = models.CharField(max_length=20, choices=CATEGORIES, null=True, blank=True)
     mobile = models.CharField(max_length=15, null=True, blank=True)
@@ -91,6 +94,8 @@ class Voter(models.Model):
     polling_booth = models.ForeignKey(PollingBooth, related_name='voters', on_delete=CASCADE)
     polling_station_image = models.ForeignKey(
         PollingStationImage, related_name='voters', on_delete=CASCADE, null=True, blank=True)
+    voter_image = models.ForeignKey(
+    VoterImage, related_name='voters', on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.voter_id
