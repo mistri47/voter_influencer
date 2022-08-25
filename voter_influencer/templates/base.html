@@ -48,7 +48,7 @@
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'home' %}">voter-influencer</a>
+        <a class="navbar-brand" href="{% url 'home' %}">My Consti.</a>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
@@ -58,6 +58,9 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'worker_network' %}">Worker Network</a>
+            </li>            
             {% if request.user.is_authenticated %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
@@ -97,7 +100,9 @@
 
     </div> <!-- /container -->
 
-    {% block modal %}{% endblock modal %}
+    {% block modal %}
+    
+    {% endblock modal %}
 
     {% block inline_javascript %}
     {# Script tags with only code, no src (defer by default) #}
