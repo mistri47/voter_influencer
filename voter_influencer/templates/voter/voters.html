@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+<h1>
+    Voters
+</h1>    
+{% endblock page_title %}
+
+
+
+{% block search_bar %}
+<form method="POST" action="{% url 'voters' %}">
+    {% csrf_token %}
+
+    <label for="id_booth">Booth:</label>
+    <select name="booth" id="id_booth">
+        <option value="" selected="">-- Any --</option>
+        {% for booth in booths %}
+        <option value="{{booth.id}}">{{booth}}</option>
+        {% endfor %}
+    </select>
+
+    <label for="id_mobile">Mobile:</label>
+    <input type="number" name="mobile" id="id_mobile">
+    <label for="id_voter_id">Voter ID:</label>
+    <input type="text" name="voter_id" id="id_voter_id">
+
+    <button class="btn btn-primary">Search</button>
+</form>
+{% endblock search_bar %}
+
+
+{% block content %}
+<table class="table">
+    <th>Image</th>
+    <th>Data</th>
+    <th>Data</th>
+    <th>Voter ID</th>
+    <th>Name</th>
+    <th>Father Name</th>
+    <th>Husband Name</th>
+    <th>Gender</th>
+    <th>Age</th>
+    <th>House No.</th>
+    <tbody>
+        {% for voter in voters %}
+        <tr>
+            <td><img src="/media/{{voter.voter_image.image_url}}" width="150"></td>
+            <td>{{voter.data_hin}}</td>
+            <td>{{voter.data_eng}}</td>
+            <td>{{voter.voter_id}}</td>
+            <td>{{voter.full_name}}</td>
+            <td>{{voter.father_name}}</td>
+            <td>{{voter.husband_name}}</td>
+            <td>{{voter.gender}}</td>
+            <td>{{voter.age}}</td>
+            <td>{{voter.house_number}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

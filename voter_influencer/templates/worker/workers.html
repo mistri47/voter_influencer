@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}
+<h1>
+    Workers
+</h1>    
+{% endblock page_title %}
+
+
+{% block search_bar %}
+<form method="POST" action="{% url 'workers' %}">
+    {% csrf_token %}
+    <input type="text" name="booth_id" />
+
+    <select class="dropdown">
+        <option>-- All --</option>
+    {% for worker_type in worker_types %}
+        <option id="{{worker_type.id}}">{{worker_type.title}}</option>
+    {% endfor %}
+    </select>
+
+    <button class="btn btn-primary">Search</button>
+</form>
+{% endblock search_bar %}
+
+
+{% block toolbar %}
+
+    <a href="{% url 'add_worker' %}" class="btn btn-primary">Add</a>
+
+{% endblock toolbar %}
+
+
+
+{% block content %}
+
+<table class="table">
+    <th>Name</th>
+    <th>Mobile</th>
+    <th>Type</th>
+    <th>Gender</th>
+    <th>Actions</th>
+    <tbody>
+        {% for worker in workers %}
+        <tr>
+            <td>{{worker.full_name}}</td>
+            <td>{{worker.mobile}}</td>
+            <td>{{worker.worker_type}}</td>
+            <td>{{worker.gender}}</td>
+            <td><a href="{% url 'update_worker' worker.id %}">Edit</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

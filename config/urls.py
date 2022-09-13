@@ -9,11 +9,33 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 
 import voter.views as voter_views
+import partyworker.views as party_worker_views
+import polling_station.views as polling_views
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
-    path("worker-network/", voter_views.workers, name="worker_network"),
+
+
+    path("workers/", party_worker_views.workers, name="workers"),
+    path("add_worker/", party_worker_views.worker_add, name="add_worker"),
+    path("update_worker/<int:id>/", party_worker_views.edit_worker, name="update_worker"),
+
+    path("voters/", voter_views.voters, name="voters"),
+    path("comm/", TemplateView.as_view(template_name="communication/comm.html"), name="communication"),
+    path("graphs/", TemplateView.as_view(template_name="graph/graphs.html"), name="graphs"),
+    path("results/", TemplateView.as_view(template_name="result/results.html"), name="results"),
+
+    path("polling_stations/", polling_views.polling_stations, name="polling_stations"),
+    path("polling_station/<int:id>/", polling_views.polling_station, name="polling_station"),
+    
+    path("create_images_from_pdf/<int:booth_id>/", polling_views.create_images_from_pdf, name="create_images_from_pdf"),
+    path("draw_boxes_around_voter_details/<int:booth_id>/", polling_views.draw_boxes_around_voter_details, name="draw_boxes_around_voter_details"),
+    path("crop_voter_details_images/<int:booth_id>/", polling_views.crop_voter_details_images, name="crop_voter_details_images"),
+    path("read_voter_id/<int:booth_id>/", polling_views.read_voter_id, name="read_voter_id"),
+    path("capture_details/<int:booth_id>/", polling_views.capture_details, name="capture_details"),
+
+    path("add_polling_station/", polling_views.add_polling_station, name="add_polling_station"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management

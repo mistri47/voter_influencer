@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}
+<h1>
+    Add Worker
+</h1>    
+{% endblock page_title %}
+
+
+{% block search_bar %}
+<form method="POST" action="{% url 'workers' %}">
+    {% csrf_token %}
+    <input type="text" name="booth_id" />
+
+    <select class="dropdown">
+        <option>-- All --</option>
+    {% for worker_type in worker_types %}
+        <option id="{{worker_type.id}}">{{worker_type.title}}</option>
+    {% endfor %}
+    </select>
+
+    <button class="btn btn-primary">Search</button>
+</form>
+{% endblock search_bar %}
+
+
+{% block toolbar %}
+
+    <a href="{% url 'add_worker' %}" class="btn btn-primary">Add</a>
+
+{% endblock toolbar %}
+
+
+
+{% block content %}
+
+<form enctype="multipart/form-data" method="post" id="partyworker_form" novalidate="">
+    {% csrf_token %}
+      <fieldset class="module aligned ">
+           
+        <div class="form-group">
+            <div>
+                <label for="id_mobile">Mobile:</label>
+                <input type="number" name="mobile" id="id_mobile">
+            </div>
+        
+            </div>
+        
+            <div class="form-group">
+                    <div>
+                            <label for="id_full_name">Full name:</label>
+                                <input type="text" name="full_name" class="vTextField" maxlength="100" id="id_full_name">
+                    </div>
+            </div>
+        
+            <div class="form-row field-gender">
+                
+                
+                <div class="form-group">
+                    <label for="id_gender">Gender:</label>
+                    <select name="gender" id="id_gender">
+                        <option value="" selected="">---------</option>
+                        <option value="MALE">MALE</option>
+                        <option value="FEMALE">FEMALE</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <div>
+                    <label class="required" for="id_worker_type">Worker type:</label>
+                    
+                    <div class="related-widget-wrapper">
+                        <select name="worker_type" required="" id="id_worker_type">
+                            <option value="" selected="">---------</option>
+                            {% for worker_type in worker_types %}
+                            <option value="{{worker_type.id}}" selected="">{{worker_type.title}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <label class="required" for="id_caste">Caste:</label>
+                            
+                        <div class="related-widget-wrapper">
+                            <select name="caste" required="" id="id_caste">
+                                 <option value="" selected="">---------</option>
+                                 {% for caste_name in caste_names %}
+                                 <option value="{{caste_name.id}}" selected="">{{caste_name.title}}</option>
+                                {% endfor %}
+    
+                            </select>
+        
+                        </div>
+                </div>
+            </div>
+             
+        
+        
+    </fieldset>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <input type="submit" value="Save" class="default" name="_save">
+    
+    
+    </form>
+
+{% endblock content %}

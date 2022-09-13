@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+    Details
+</h1>
+
+<table class="table">
+    <tbody>
+        <tr>
+            <td>Name</td>
+            <td>{{polling_station.name}}</td>
+        </tr>
+        <tr>
+            <td>Pages</td>
+            <td>{{polling_station.images.count}}</td>
+        </tr>        
+        <tr>
+            <td>Total Voters</td>
+            <td>{{polling_station.total_voters}}</td>
+        </tr>
+        <tr>
+            <td>Male Voters</td>
+            <td>{{polling_station.male_voters}}</td>
+        </tr>
+        <tr>
+            <td>Female Voters</td>
+            <td>{{polling_station.female_voters}}</td>                        
+        </tr>
+        <tr>
+            <td>Other Voters</td>
+            <td>{{polling_station.other_voters}}</td>                        
+        </tr>        
+        <tr>
+            <td>Extracted Voter Images</td>
+            <td>{{polling_station.voter_images.count}}</td>
+        </tr>
+        <tr>
+            <td>Extracted Voter Data</td>
+            <td>{{polling_station.voters.count}}</td>
+        </tr>        
+        <tr>
+            <td>Extracted Male Voter Img</td>
+            <td>{{polling_station.male_voters}}</td>
+        </tr>
+        <tr>
+            <td>Extracted Female Voter Img</td>
+            <td>{{polling_station.female_voters}}</td>                        
+        </tr>  
+        <tr>
+            <td>Extracted Other Voters</td>
+            <td>{{polling_station.female_voters}}</td>                        
+        </tr>                
+        <tr>
+            <td>PDF to Images</td>
+            <td><a href="{% url 'create_images_from_pdf' %}">01 Create Images</a></td>                        
+        </tr>                
+        <tr>
+            <td>Image Box Marking</td>
+            <td><a href="{% url 'draw_boxes_around_voter_details' %}">02 Box Marking</a></td>                        
+        </tr>  
+        <tr>
+            <td>Crop Images for voters</td>
+            <td><a href="{% url 'crop_voter_details_images' %}">03 Crop Voter Images</a></td>                        
+        </tr>          
+        <tr>
+            <td>Voter ID</td>
+            <td><a href="{% url 'read_voter_id' %}">04 Extract Voter ID</a></td>                        
+        </tr>
+        <tr>
+            <td>Capture Details</td>
+            <td><a href="{% url 'capture_details' %}">05 Read Details</a></td>                        
+        </tr>
+        
+    </tbody>
+</table>
+<BR>
+
+<!-- {% include 'polling_stations/images.html' with polling_station=polling_station %} -->
+
+    <!-- <iframe src="{{polling_station.voter_list.url}}" height="200" width="300"></iframe> -->
+<!-- <object data="{{polling_station.voter_list.url}}" type="application/pdf" width="100%" height="500">
+    <p>Alternative text - include a link <a href="{{polling_station.voter_list.url}}">to the PDF!</a></p>
+  </object> -->
+
+{% endblock content %}

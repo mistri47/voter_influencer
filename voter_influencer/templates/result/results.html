@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}
+<h1>
+    Results
+</h1>    
+{% endblock page_title %}
+
+{% block content %}
+
+<form method="POST" action="{% url 'results' %}">
+    {% csrf_token %}
+    <input type="text" name="booth_id" />
+
+    <select class="dropdown">
+        <option>-- All --</option>
+    {% for worker_type in worker_types %}
+        <option id="{{worker_type.id}}">{{worker_type.title}}</option>
+    {% endfor %}
+    </select>
+
+    <button class="btn btn-primary">Search</button>
+</form>
+<h2><button class="btn btn-primary">Add Worker</button></h2>
+<table class="table">
+    <th>Name</th>
+    <th>Mobile</th>
+    <th>Type</th>
+    <tbody>
+        {% for worker in workers %}
+        <tr>
+            <td>{{worker.name}}</td>
+            <td>{{worker.mobile}}</td>
+            <td>{{worker.worker_type}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

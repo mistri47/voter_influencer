@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+    Add Station: 
+</h1>
+
+<form method="POST" action="{% url 'add_polling_station' %}">
+    {% csrf_token %}
+    <input type="text" name="number" />
+    <input type="text" name="name" />
+
+    <button class="btn btn-primary">Save</button>
+</form>
+
+{% endblock content %}

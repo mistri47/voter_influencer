@@ -72,11 +72,16 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "django_bootstrap5",
+    "fontawesomefree"
 ]
 
 LOCAL_APPS = [
     "voter_influencer.users.apps.UsersConfig",
     "voter.apps.VoterConfig",
+    "partyworker.apps.PartyworkerConfig",
+    "communication.apps.CommunicationConfig",
+    "polling_station.apps.PollingStationConfig"
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -307,3 +312,22 @@ REST_FRAMEWORK = {
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+
+
+GENDERS = (
+    ('MALE', 'MALE'),
+    ('FEMALE', 'FEMALE'),
+    ('OTHER', 'OTHER')
+)
+
+CATEGORIES = (
+    ('GENERAL', 'GENERAL'),
+    ('OBC', 'OBC'),
+    ('SC', 'SC'),
+    ('ST', 'ST')
+)
+
+X_FRAME_OPTIONS = 'ALLOWALL'
+
+XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']

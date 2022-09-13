@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+    Polling Stations: 
+</h1>
+
+<h2>
+    <a href="{% url 'add_polling_station' %}" class="btn btn-primary">Add</a>
+</h2>
+
+<table class="table">
+    <th>ID</th>
+    <th>Name</th>
+    <th>Address</th>
+    <th>Total Voters</th>
+    <th>Male</th>
+    <th>Female</th>
+    <th>Other</th>
+    <tbody>
+        {% for polling_station in polling_stations %}
+        <tr>
+            <td>{{polling_station.number}}</td>
+            <td><a href="{% url 'polling_station' polling_station.id  %}">{{polling_station.name}}</a></td>
+            <td>{{polling_station.address}}</td>
+            <td>{{polling_station.total_voters}}</td>
+            <td>{{polling_station.male_voters}}</td>
+            <td>{{polling_station.female_voters}}</td>
+            <td>{{polling_station.other_voters}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

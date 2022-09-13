@@ -1,0 +1,16 @@
+{% for image in polling_station.images.all %}
+<div class="row">
+    <div class="col">
+        <img src="/media/{{image.boxed_image_url}}" width="600" alt="...">
+    </div>
+</div>
+    {% for vimage in image.voter_images.all %}
+    <div class="row">
+        <div class="col">
+            <img src="/media/{{vimage.image_url}}" width="250" alt="...">
+        </div>
+    </div>
+
+    {% endfor %}
+
+{% endfor %}
