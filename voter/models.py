@@ -2,48 +2,16 @@ from django.db import models
 from django.db.models.deletion import RESTRICT
 from django.db.models.fields import CharField
 from enum import Enum
+from django.conf import settings
 
 from voter_influencer.users.models import User
 # Create your models here.
-
-
-class PollingBooth(models.Model):
-    name = models.CharField(max_length=100)
-    number = models.SmallIntegerField()
-    address = models.TextField(null=True, blank=True)
-    voter_list = models.FileField(null=True, blank=True)
-    images_created = models.BooleanField(default=False)
-    is_processed = models.BooleanField(default=False)
-    has_errors = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return str(self.number) + "-"+ self.name
-
-
-class VoterListPageTypes(Enum):
-    VOTER_LIST = 'VOTER_LIST'
-    SUMMARY = 'SUMMARY'
-    MAP = 'MAP'
-
-
-class PollingStationImage(models.Model):
-    station = models.ForeignKey(PollingBooth, related_name='images', on_delete=RESTRICT)
-    type = models.CharField(max_length=20, default=VoterListPageTypes.VOTER_LIST.name)
-    image = models.FileField(null=True, blank=True)
-    boxed_image = models.FileField(null=True, blank=True)
-    boxed_image_url = models.FileField(null=True, blank=True)
-    page_number = models.SmallIntegerField()
-    is_previewd = models.BooleanField(default=False)
-    is_processed = models.BooleanField(default=False)
-    has_errors = models.BooleanField(default=False)
-    md5_signature = models.CharField(max_length=1000, unique=True)
-
-    def __str__(self) -> str:
-        return self.image.url
+from polling_station.models import PollingStationImage, PollingStation
 
 
 
 class VoterImage(models.Model):
+    polling_station = models.ForeignKey(PollingStation, related_name='voter_images', on_delete=RESTRICT)
     station_image = models.ForeignKey(PollingStationImage, related_name='voter_images', on_delete=RESTRICT)
     image = models.FileField(null=True, blank=True)
     image_url = models.FileField(null=True, blank=True)
@@ -65,45 +33,15 @@ class VoterImage(models.Model):
 
 
 
-GENDERS = (
-    ('MALE', 'MALE'),
-    ('FEMALE', 'FEMALE'),
-    ('OTHER', 'OTHER')
-)
-
-CATEGORIES = (
-    ('GENERAL', 'GENERAL'),
-    ('OBC', 'OBC'),
-    ('SC', 'SC'),
-    ('ST', 'ST')
-)
-
 class Caste(models.Model):
     title = models.CharField(max_length=100)
-    category = models.CharField(max_length=20, choices=CATEGORIES)
+    category = models.CharField(max_length=20, choices=settings.CATEGORIES)
     related_surnames = models.TextField()
 
     def __str__(self) -> str:
         return self.title + " - " + self.category
 
-class AgentType(models.Model):
-    title = models.CharField(max_length=100, null=True, blank=True)
 
-    def __str__(self) -> str:
-        return self.title
-
-class PollingAgent(models.Model):
-    user = models.OneToOneField(User, on_delete=RESTRICT)
-    full_name = models.CharField(max_length=100, null=True, blank=True)
-    agent_type = models.ForeignKey(AgentType, related_name='agents', on_delete=RESTRICT)
-    caste = models.ForeignKey(Caste, related_name='agents', on_delete=RESTRICT)
-    category = models.CharField(max_length=20, choices=CATEGORIES, null=True, blank=True)
-    polling_booth = models.ForeignKey(PollingBooth, related_name='agents', on_delete=RESTRICT)
-    mobile = models.BigIntegerField(max_length=10, null=True, blank=True)
-    points = models.IntegerField(default=0)
-
-    def __str__(self) -> str:
-        return self.user.username
 
 
 class Voter(models.Model):
@@ -114,20 +52,22 @@ class Voter(models.Model):
     father_name = models.CharField(max_length=100, null=True, blank=True)
     husband_name = models.CharField(max_length=100, null=True, blank=True)
     age = models.SmallIntegerField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=GENDERS, null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=settings.GENDERS, null=True, blank=True)
     house_number = models.CharField(max_length=20, null=True, blank=True)
     caste = models.ForeignKey(Caste, related_name='voters', on_delete=RESTRICT, null=True, blank=True)
-    category = models.CharField(max_length=20, choices=CATEGORIES, null=True, blank=True)
+    category = models.CharField(max_length=20, choices=settings.CATEGORIES, null=True, blank=True)
     mobile = models.CharField(max_length=15, null=True, blank=True)
 
     data_eng = models.TextField(null=True, blank=True)
     data_hin = models.TextField(null=True, blank=True)
 
-    polling_booth = models.ForeignKey(PollingBooth, related_name='voters', on_delete=RESTRICT)
+    polling_booth = models.ForeignKey(PollingStation, related_name='voters', on_delete=RESTRICT)
     polling_station_image = models.ForeignKey(
-        PollingStationImage, related_name='voters', on_delete=RESTRICT, null=True, blank=True)
-    voter_image = models.ForeignKey(
-    VoterImage, related_name='voters', on_delete=RESTRICT, null=True, blank=True)
+        PollingStationImage, related_name='voters', on_delete=RESTRICT)
+    voter_image = models.ForeignKey(VoterImage, related_name='voters', on_delete=RESTRICT)
+
+    class Meta:
+        ordering = ('polling_booth', 'house_number',)
 
     def __str__(self) -> str:
         return self.md5_signature

@@ -153,7 +153,7 @@ def process_voter_list_page():
     # list of non-processed booths
     print("Processing Images to extract details. First we delete all old voters and then extract each page images.")
 
-    booths = PollingBooth.objects.filter(
+    booths = PollingStation.objects.filter(
         images_created=True,
         is_processed=False
     )
