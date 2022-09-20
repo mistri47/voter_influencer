@@ -81,7 +81,8 @@ LOCAL_APPS = [
     "voter.apps.VoterConfig",
     "partyworker.apps.PartyworkerConfig",
     "communication.apps.CommunicationConfig",
-    "polling_station.apps.PollingStationConfig"
+    "polling_station.apps.PollingStationConfig",
+    "expenses.apps.ExpensesConfig"
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

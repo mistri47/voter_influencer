@@ -12,12 +12,14 @@ import voter.views as voter_views
 import partyworker.views as party_worker_views
 import polling_station.views as polling_views
 
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
 
 
-    path("workers/", party_worker_views.workers, name="workers"),
+    path("workers/", include('partyworker.urls')),
+
     path("add_worker/", party_worker_views.worker_add, name="add_worker"),
     path("update_worker/<int:id>/", party_worker_views.edit_worker, name="update_worker"),
 
