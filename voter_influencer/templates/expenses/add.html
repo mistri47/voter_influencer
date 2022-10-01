@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}
+<h1>
+    Add expenses
+</h1>
+{% endblock page_title %}
+
+
+{% block search_bar %}
+<form method="POST" >
+    {% csrf_token %}
+    <input type="text" name="booth_id" />
+
+    <select class="dropdown">
+        <option>-- All --</option>
+    </select>
+
+    <button class="btn btn-primary">Search</button>
+</form>
+{% endblock search_bar %}
+
+
+{% block toolbar %}
+
+
+{% endblock toolbar %}
+
+{% block content %}
+<form method = "post">
+ {%csrf_token%}
+  <fieldset class="module aligned ">
+    <div class="form-group">
+      <label for="Name" class="form-label">vikaskhand</label>
+      <input type="text" class="form-control" id="vikaskhand" name="vikaskhand" required>
+
+    </div>
+
+    <div class="form-group">
+      <label for="Name" class="form-label">panchayat</label>
+      <input type="text" class="form-control" id="panchayat" name="panchayat" required>
+    </div>
+
+    <div class="form-group">
+      <label for="Name" class="form-label">village_name</label>
+      <input type="text" class="form-control" id="village_name" name="village_name" required>
+    </div>
+
+    <div class="form-group">
+      <label for="text" class="form-label">workd_details</label>
+      <input type="text" class="form-control" id="workd_details" name="workd_details" required>
+    </div>
+
+    <div class="form-group">
+      <label for="amount" class="form-label">amount</label>
+      <input type="integer" class="form-control" id="amount" name="amount" required>
+    </div>
+
+    <div class="form-group">
+      <label for="department" class="form-label">department</label>
+      <input type="text" class="form-control" id="department" name="department" required>
+    </div>
+
+    <div class="form-group">
+      <label for="financial_year" class="form-label">financial_year</label>
+      <input type="integer" class="form-control" id="financial_year" name="financial_year" required>
+    </div>
+
+    <form>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+  </fieldset>
+
+
+</form>
+{% endblock content %}

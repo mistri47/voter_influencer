@@ -11,6 +11,7 @@ class Expense(models.Model):
     amount = models.BigIntegerField(default=0)
     department = models.CharField(max_length=100)
     financial_year = models.SmallIntegerField(default=2000)
+    
 
     def __str__(self) -> str:
         return f"{self.vikaskhand} : {self.panchayat} : {self.workd_details}"

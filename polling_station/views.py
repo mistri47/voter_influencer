@@ -4,7 +4,7 @@ from .models import PollingStation
 from .tasks import pdf_to_images_task, draw_boxes_around_voter_details_task, crop_voter_details_images_task, update_voter_id_task, update_details_task
 # Create your views here.
 
-def polling_station(request, id):
+def details(request, id):
     polling_station = PollingStation.objects.get(pk=id)
 
     return render(request, 'polling_stations/station_details.html', {
@@ -12,11 +12,27 @@ def polling_station(request, id):
     })  
 
 
-def polling_stations(request):
+def list_items(request):
     polling_stations = PollingStation.objects.all()
     return render(request, 'polling_stations/polling_stations.html', {
         'polling_stations': polling_stations
     })  
+
+
+
+def add(request):
+    if request.method == 'POST':
+        number = request.POST['number']
+        name = request.POST['name']
+
+    return render(request, 'polling_stations/add_polling_station.html', {
+    })   
+
+def update(request, id):
+    pass
+
+def delete(request, id):
+    pass
 
 
 def create_images_from_pdf(request, booth_id):
@@ -38,11 +54,4 @@ def read_voter_id(request, booth_id):
 def capture_details(request, booth_id):
     update_details_task.delay()
     return render(request, 'pages/home.html', {})
-
-def add_polling_station(request):
-    if request.method == 'POST':
-        number = request.POST['number']
-        name = request.POST['name']
-
-    return render(request, 'polling_stations/add_polling_station.html', {
-    })    
+ 

@@ -6,7 +6,7 @@ from .models import Voter
 from django.db.models import Q
 
 
-def voters(request):
+def list_items(request):
 
     if request.method == 'POST':
         mobile = request.POST['mobile']

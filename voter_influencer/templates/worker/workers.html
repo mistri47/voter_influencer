@@ -9,7 +9,7 @@
 
 
 {% block search_bar %}
-<form method="POST" action="{% url 'workers' %}">
+<form method="POST" action="{% url 'list_workers' %}">
     {% csrf_token %}
     <input type="text" name="booth_id" />
 

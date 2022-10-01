@@ -1,8 +1,11 @@
 from django.urls import include, path
 
 
-import partyworker.views as party_worker_views
+from .views import *
 
 urlpatterns = [
-    path("workers/", party_worker_views.workers, name="workers"),
+    path("",                    list_items,         name="list_workers"),
+    path("add/",                add_item,           name="add_worker"),
+    path("update/<int:id>/",    update_item,        name="update_worker"),
+
 ]

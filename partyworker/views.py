@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -6,8 +6,8 @@ from partyworker.models import PartyWorker, WorkerType
 
 from voter.models import Caste
 
-# Create your views here.
-def workers(request):
+
+def list_items(request):
 
     booth_id = None
     if request.method == 'POST':
@@ -22,7 +22,7 @@ def workers(request):
     })
 
 
-def worker_add(request):
+def add_item(request):
 
     worker_types = WorkerType.objects.all()
     caste_names = Caste.objects.all()
@@ -48,6 +48,7 @@ def worker_add(request):
             worker_type = worker_type,
             caste = caste
         ).save()
+        return redirect('list_workers')
 
     return render(request, 'worker/add_worker.html', {
         'worker_types': worker_types,
@@ -55,7 +56,7 @@ def worker_add(request):
     })
       
 
-def edit_worker(request, id):
+def update_item(request, id):
 
     worker_types = WorkerType.objects.all()
     caste_names = Caste.objects.all()
@@ -72,12 +73,13 @@ def edit_worker(request, id):
         worker_type = WorkerType.objects.get(pk=worker_type_id)
         caste = Caste.objects.get(pk=caste_id)
 
-        
         worker.full_name = full_name
         worker.gender = gender
         worker.worker_type = worker_type
         worker.caste = caste
         worker.save()
+
+        return redirect('list_workers')
 
     return render(request, 'worker/edit_worker.html', {
         'worker_types': worker_types,
@@ -85,3 +87,7 @@ def edit_worker(request, id):
         'worker': worker
     })
             
+
+def delete_item(request, id):
+    return redirect('list_workers')
+    pass
